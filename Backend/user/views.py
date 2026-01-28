@@ -7,6 +7,8 @@ from rest_framework.status import HTTP_200_OK, HTTP_400_BAD_REQUEST
 from rest_framework.views import APIView
 from rest_framework.pagination import LimitOffsetPagination
 from rest_framework.throttling import ScopedRateThrottle
+from django.views.decorators.csrf import csrf_exempt
+from django.utils.decorators import method_decorator
 from .models import User, UserData,UserLoginData
 from .serializers import UserSerializer, UserDataSerializer, UserNoPassSerializer, UserNoTypeSerializer, UserLoginDataSerializer
 from .permission import UserSafePostOnly, UserPUTOnly, AuthPUTOnly,ManagerOnly
@@ -137,6 +139,7 @@ class UserLoginDataAPIView(APIView):
 
 
 
+@method_decorator(csrf_exempt, name='dispatch')
 class UserLoginAPIView(APIView):
     queryset = User.objects.all()
     serializer_class = UserSerializer
@@ -148,8 +151,14 @@ class UserLoginAPIView(APIView):
         data = request.data
         username = data.get('username')
         password = data.get('password')
-        user = User.objects.get(username__exact=username)
-        userdata = UserData.objects.get(username__exact=username)
+        try:
+            user = User.objects.get(username__exact=username)
+            userdata = UserData.objects.get(username__exact=username)
+        except User.DoesNotExist:
+            return Response({'status': 'usererror', 'message': '用户不存在'}, status=HTTP_200_OK)
+        except UserData.DoesNotExist:
+            return Response({'status': 'error', 'message': '用户数据错误'}, status=HTTP_200_OK)
+
         if user.password == password:
             serializer = UserSerializer(user)
             new_data = serializer.data
@@ -157,7 +166,7 @@ class UserLoginAPIView(APIView):
             request.session['type'] = user.type
             request.session['rating'] = userdata.rating
             return Response(new_data, status=HTTP_200_OK)
-        return Response('passworderror', HTTP_200_OK)
+        return Response({'status': 'passworderror', 'message': '密码错误'}, status=HTTP_200_OK)
 
 
 class UserUpdateRatingAPIView(APIView):
@@ -177,18 +186,36 @@ class UserUpdateRatingAPIView(APIView):
             return Response('ok', HTTP_200_OK)
 
 
+@method_decorator(csrf_exempt, name='dispatch')
 class UserLogoutAPIView(APIView):
     throttle_scope = "post"
     throttle_classes = [ScopedRateThrottle, ]
 
     def get(self, request):
-        if request.session.get('user_id', None) is not None:
-            del request.session['user_id']
-        if request.session.get('type', None) is not None:
-            del request.session['type']
-        if request.session.get('rating', None) is not None:
-            del request.session['rating']
-        return Response('ok', HTTP_200_OK)
+        try:
+            if request.session.get('user_id', None) is not None:
+                del request.session['user_id']
+            if request.session.get('type', None) is not None:
+                del request.session['type']
+            if request.session.get('rating', None) is not None:
+                del request.session['rating']
+            request.session.flush()  # 显式清除整个会话
+            return Response({'status': 'ok'}, status=HTTP_200_OK)
+        except Exception as e:
+            return Response({'status': 'error', 'message': str(e)}, status=HTTP_200_OK)
+
+    def post(self, request):
+        try:
+            if request.session.get('user_id', None) is not None:
+                del request.session['user_id']
+            if request.session.get('type', None) is not None:
+                del request.session['type']
+            if request.session.get('rating', None) is not None:
+                del request.session['rating']
+            request.session.flush()  # 显式清除整个会话
+            return Response({'status': 'ok'}, status=HTTP_200_OK)
+        except Exception as e:
+            return Response({'status': 'error', 'message': str(e)}, status=HTTP_200_OK)
 
 
 class UserRegisterAPIView(APIView):

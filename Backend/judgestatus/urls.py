@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from django.conf.urls import url, include
+from django.urls import path, re_path, include
 from . import views
 from rest_framework import routers
 
@@ -11,6 +11,6 @@ routers.register('casestatus', views.CaseStatusView)
 routers.register('acrank', views.ACRankView)
 
 urlpatterns = [
-    url('', include(routers.urls)),
-    url(r'^rejudge', views.RejudgeAPIView.as_view()),
+    path('', include(routers.urls)),
+    re_path(r'^rejudge', views.RejudgeAPIView.as_view()),
 ]

@@ -112,11 +112,11 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'LPOJ',
-        'USER': os.environ.get("DB_USER")  if os.environ.get("DB_USER") else 'root' ,
-        'PASSWORD':os.environ.get("DB_PASSWORD")  if os.environ.get("DB_PASSWORD") else '504603913',
+        'USER': os.environ.get("DB_USER")  if os.environ.get("DB_USER") else 'lpoj' ,
+        'PASSWORD':os.environ.get("DB_PASSWORD")  if os.environ.get("DB_PASSWORD") else 'lpojdatabase',
         'HOST': os.environ.get("DB_HOST")  if os.environ.get("DB_HOST") else 'localhost',
         'PORT': os.environ.get("DB_PORT")  if os.environ.get("DB_PORT") else 3306,
-      
+
     }
 }
 

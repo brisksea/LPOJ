@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from django.conf.urls import url, include
+from django.urls import path, re_path, include
 from . import views
 from rest_framework import routers
 
@@ -10,10 +10,10 @@ routers.register('problemtag', views.ProblemTagView)
 routers.register('choiceproblem', views.ChoiceProblemView)
 
 urlpatterns = [
-    url('', include(routers.urls)),
-    url(r'^uploadfile', views.UploadFileAPIView.as_view()),
-    url(r'^downloadfile/',views.filedown,name='download'),
-    url(r'^showpic/',views.showpic,name='show_picture'),
-    url(r'^judgerdownloadfile/',views.judgerfiledown,name='judgerfiledown'),
-    url(r'^judgerfiletime/',views.judgerfiletime,name='judgerfiletime'),
+    path('', include(routers.urls)),
+    re_path(r'^uploadfile', views.UploadFileAPIView.as_view()),
+    re_path(r'^downloadfile/',views.filedown,name='download'),
+    re_path(r'^showpic/',views.showpic,name='show_picture'),
+    re_path(r'^judgerdownloadfile/',views.judgerfiledown,name='judgerfiledown'),
+    re_path(r'^judgerfiletime/',views.judgerfiletime,name='judgerfiletime'),
 ]
