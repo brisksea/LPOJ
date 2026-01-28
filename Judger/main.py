@@ -80,7 +80,7 @@ class GlobalVar:
         GlobalVar.logger.info("Judger name: " + GlobalVar.judgername)
 
         GlobalVar.host = GlobalVar.judgerjson["server_ip"]
-        GlobalVar.port = GlobalVar.judgerjson["server_port"]
+        GlobalVar.port = int(GlobalVar.judgerjson["server_port"])
         GlobalVar.python3path = GlobalVar.judgerjson["python3_path"]
         GlobalVar.python2path = GlobalVar.judgerjson["python2_path"]
 
