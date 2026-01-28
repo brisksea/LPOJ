@@ -1,8 +1,8 @@
-Django==2.2.8
-djangorestframework==3.9.3
-django-filter==2.1.0
-django-cors-headers==2.5.3
-mysqlclient==1.4.2.post1
-django-sslserver
-gevent
-gunicorn==19.9.0
+Django==4.2.11
+djangorestframework==3.14.0
+django-filter==23.5
+django-cors-headers==4.3.1
+mysqlclient==2.2.4
+django-sslserver==0.22
+gevent==24.2.1
+gunicorn==21.2.0

@@ -55,7 +55,7 @@ class GlobalVar:
         GlobalVar.initLogger()
 
         GlobalVar.statue = True
-        myjsonfile = open("./setting.json", 'r')
+        myjsonfile = open("./setting.json", 'r', encoding='utf-8')
         GlobalVar.judgerjson = json.loads(myjsonfile.read())
         myjsonfile.close()
 
@@ -72,7 +72,7 @@ class GlobalVar:
             # GlobalVar.judgerjson["backend_path"] = os.environ.get("BACKEND_PATH")
             GlobalVar.judgerjson["nodownload"] = os.environ.get("NO_DOWNLOAD")
 
-        datajsonfile = open("./datatime.json", 'r')
+        datajsonfile = open("./datatime.json", 'r', encoding='utf-8')
         GlobalVar.datatimejson = json.loads(datajsonfile.read())
         datajsonfile.close()
 
@@ -374,7 +374,7 @@ def judgePython2(timelimit, memorylimit, inputpath, outputpath, errorpath, id, j
                         error_path=errorpath,
                         args=[judgername+".py"],
                         # can be empty list
-                        env=[],
+                        env=["PYTHONIOENCODING=utf-8"],
                         log_path=judgername+"judger.log",
                         # can be None
                         seccomp_rule_name="general",
@@ -396,7 +396,7 @@ def judgePython3(timelimit, memorylimit, inputpath, outputpath, errorpath, id, j
                         error_path=errorpath,
                         args=[judgername+".py"],
                         # can be empty list
-                        env=[],
+                        env=["PYTHONIOENCODING=utf-8"],
                         log_path=judgername+"judger.log",
                         # can be None
                         seccomp_rule_name="general",
@@ -502,7 +502,7 @@ def compileC(id,code,judgername,problem):
     result = os.system("timeout 10 gcc %s.c -fmax-errors=3 -o %s.out -O2 -std=c11 2>%sce.txt" % (judgername, judgername, judgername))
     if result:
         try:
-            filece = open("%sce.txt" % judgername, "r")
+            filece = open("%sce.txt" % judgername, "r", encoding='utf-8')
             msg = str(filece.read())
             if msg == "": msg = "Compile timeout! Maybe you define too big arrays!"
             filece.close()
@@ -522,7 +522,7 @@ def compileCPP(id,code,judgername,problem):
     result = os.system("timeout 10 g++ %s.cpp -fmax-errors=3 -o %s.out -O2 -std=c++14 2>%sce.txt" %(judgername, judgername, judgername))
     if result:
         try:
-            filece = open("%sce.txt" % judgername, "r")
+            filece = open("%sce.txt" % judgername, "r", encoding='utf-8')
             msg = str(filece.read())
             if msg == "": msg = "Compile timeout! Maybe you define too big arrays!"
             filece.close()
@@ -572,7 +572,7 @@ def compileJava(id,code,judgername,problem):
 
     if result:
         try:
-            filece = open("%sce.txt" % judgername, "r")
+            filece = open("%sce.txt" % judgername, "r", encoding='utf-8')
             msg = str(filece.read())
             filece.close()
             Controller.compileError(id,problem,msg)
@@ -591,7 +591,7 @@ def compileSwift(id,code,judgername,problem):
     result = os.system("swiftc %s.swift -o %s.out 2>%sce.txt" %(judgername, judgername, judgername))
     if result:
         try:
-            filece = open("%sce.txt" % judgername, "r")
+            filece = open("%sce.txt" % judgername, "r", encoding='utf-8')
             msg = str(filece.read())
             if msg == "": msg = "Compile timeout! Maybe you define too big arrays!"
             filece.close()
@@ -893,7 +893,7 @@ def judge(id, code, lang, problem, contest, username, submittime, contestproblem
                 try:
                     # 计算case
                     inputfile = open("./ProblemData/%s/%s.in" %
-                                     (problem, filename), "r")
+                                     (problem, filename), "r", encoding='utf-8')
                     casedata = inputfile.read(300)
                     tmpstr = inputfile.read(5)
                     if tmpstr != "":
@@ -901,14 +901,14 @@ def judge(id, code, lang, problem, contest, username, submittime, contestproblem
                     inputfile.close()
 
                     outputfile = open(
-                        "./ProblemData/%s/%s.out" % (problem, filename), "r")
+                        "./ProblemData/%s/%s.out" % (problem, filename), "r", encoding='utf-8')
                     outputdata = outputfile.read(300)
                     tmpstr = outputfile.read(5)
                     if tmpstr != "":
                         outputdata = outputdata + '\n......'
                     outputfile.close()
 
-                    useroutputfile = open(GlobalVar.judgername+"temp.out", "r")
+                    useroutputfile = open(GlobalVar.judgername+"temp.out", "r", encoding='utf-8')
                     useroutputdata = useroutputfile.read(300)
                     tmpstr = useroutputfile.read(5)
                     if tmpstr != "":
@@ -992,9 +992,9 @@ def judge(id, code, lang, problem, contest, username, submittime, contestproblem
                 else:
                     GlobalVar.logger.info("Comparing output!")
                     # 比较输出文件是否一致!
-                    file1 = open(GlobalVar.judgername+"temp.out", "r")
+                    file1 = open(GlobalVar.judgername+"temp.out", "r", encoding='utf-8')
                     file2 = open("./ProblemData/%s/%s.out" %
-                                (problem, filename), "r")
+                                (problem, filename), "r", encoding='utf-8')
                     stdout = ""
                     answer = ""
                     while True:
