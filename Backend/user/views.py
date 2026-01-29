@@ -29,7 +29,7 @@ class UserDataView(viewsets.ModelViewSet):
     queryset = UserData.objects.extra(select = { '_has' : 'if(rating=1500,0,rating)'}).order_by('-_has')
     serializer_class = UserDataSerializer
     filter_backends = (DjangoFilterBackend,)
-    filter_fields = ('username',)
+    filterset_fields = ('username',)
     permission_classes = (UserSafePostOnly,)
     pagination_class = LimitOffsetPagination
     throttle_scope = "post"
@@ -40,7 +40,7 @@ class UserView(viewsets.ModelViewSet):
     queryset = User.objects.all()
     serializer_class = UserNoPassSerializer
     filter_backends = (DjangoFilterBackend, filters.SearchFilter)
-    filter_fields = ('username',)
+    filterset_fields = ('username',)
     search_fields = ('username', 'name','realname','course','classes','school','number','qq')
     permission_classes = (UserSafePostOnly,)
     pagination_class = LimitOffsetPagination
@@ -108,7 +108,7 @@ class UserLoginDataView(viewsets.ModelViewSet):
     queryset = UserLoginData.objects.all().order_by('-id')
     serializer_class = UserLoginDataSerializer
     filter_backends = (DjangoFilterBackend, filters.SearchFilter)
-    filter_fields = ('username','ip',)
+    filterset_fields = ('username','ip',)
     search_fields = ('username', 'ip')
     permission_classes = (ManagerOnly,)
     pagination_class = LimitOffsetPagination

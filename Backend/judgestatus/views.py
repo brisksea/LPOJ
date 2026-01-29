@@ -21,7 +21,7 @@ class JudgeStatusView(viewsets.ModelViewSet):
     serializer_class = JudgeStatusSerializer
     pagination_class = LimitOffsetPagination
     filter_backends = (DjangoFilterBackend,)
-    filter_fields = ('user', 'result', "contest", "problem", "language", "problemtitle")
+    filterset_fields = ('user', 'result', "contest", "problem", "language", "problemtitle")
     permission_classes = (ManagerOnly,)
     throttle_scope = "post"
     throttle_classes = [ScopedRateThrottle, ]
@@ -80,7 +80,7 @@ class JudgeStatusCodeView(viewsets.GenericViewSet, mixins.RetrieveModelMixin):
     serializer_class = JudgeStatusCodeSerializer
     pagination_class = LimitOffsetPagination
     filter_backends = (DjangoFilterBackend,)
-    filter_fields = ('user', 'result', "contest", "problem", "problemtitle")
+    filterset_fields = ('user', 'result', "contest", "problem", "problemtitle")
     permission_classes = (NoContestOnly,)
     throttle_scope = "post"
     throttle_classes = [ScopedRateThrottle, ]
@@ -91,7 +91,7 @@ class CaseStatusView(viewsets.ModelViewSet):
     serializer_class = CaseStatusSerializer
     pagination_class = LimitOffsetPagination
     filter_backends = (DjangoFilterBackend,)
-    filter_fields = ('username', 'problem', "statusid")
+    filterset_fields = ('username', 'problem', "statusid")
     permission_classes = (ManagerOnly,)
     throttle_scope = "post"
     throttle_classes = [ScopedRateThrottle, ]
@@ -101,7 +101,7 @@ class ACRankView(viewsets.ModelViewSet):
     serializer_class = JudgeStatusSerializer
     pagination_class = LimitOffsetPagination
     filter_backends = (DjangoFilterBackend,)
-    filter_fields = ('user', 'result', "contest", "problem", "language")
+    filterset_fields = ('user', 'result', "contest", "problem", "language")
     permission_classes = (ManagerOnly,)
     throttle_scope = "post"
     throttle_classes = [ScopedRateThrottle, ]

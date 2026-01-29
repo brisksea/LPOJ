@@ -24,7 +24,7 @@ import os
 class ProblemView(viewsets.GenericViewSet, mixins.DestroyModelMixin, mixins.CreateModelMixin, mixins.RetrieveModelMixin, mixins.UpdateModelMixin):
     queryset = Problem.objects.all()
     serializer_class = ProblemSerializer
-    filter_fields = ('auth',)
+    filterset_fields = ('auth',)
     permission_classes = (AuthOnly,)
     throttle_scope = "post"
     throttle_classes = [ScopedRateThrottle, ]
@@ -33,7 +33,7 @@ class ChoiceProblemView(viewsets.ModelViewSet):
     queryset = ChoiceProblem.objects.all()
     serializer_class = ChoiceProblemSerializer
     filter_backends = (DjangoFilterBackend, filters.SearchFilter)
-    filter_fields = ('ChoiceProblemId','des')
+    filterset_fields = ('ChoiceProblemId','des')
     permission_classes = (ManagerOnly,)
     search_fields = ('des')
     throttle_scope = "post"
@@ -46,7 +46,7 @@ class ProblemDataView(viewsets.ModelViewSet):
     pagination_class = LimitOffsetPagination
     permission_classes = (ManagerOnly,)
     filter_backends = (DjangoFilterBackend, filters.SearchFilter)
-    filter_fields = ('auth','oj',)
+    filterset_fields = ('auth','oj',)
     search_fields = ('tag', 'title')
     throttle_scope = "post"
     throttle_classes = [ScopedRateThrottle, ]

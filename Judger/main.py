@@ -224,14 +224,15 @@ def remote_scp(problem, local_path):
 
             files = os.listdir("./ProblemData/%s/" % dirname)
             for s in files:
-                # 去掉\r
-                tmpfile =  open("./ProblemData/%s/%s" % (problem,s),"r",encoding='utf-8')
-                tstr = tmpfile.read()
-                tstr = tstr.replace('\r','')
-                tmpfile.close()
-                tmpfile =  open("./ProblemData/%s/%s" % (problem,s),"w",encoding='utf-8')
-                tmpfile.write(tstr)
-                tmpfile.close()
+                # 去掉\r，支持多种中文编码
+                try:
+                    content = read_file_try_encodings("./ProblemData/%s/%s" % (problem,s))
+                    content = content.replace('\r','')
+                    tmpfile = open("./ProblemData/%s/%s" % (problem,s),"w",encoding='utf-8')
+                    tmpfile.write(content)
+                    tmpfile.close()
+                except Exception as e:
+                    GlobalVar.logger.error("Error processing file %s: %s" % (s, repr(e)))
                 
             GlobalVar.logger.info("Extract Succeed!")
             return True
@@ -299,14 +300,15 @@ def remote_scp(problem, local_path):
 
             files = os.listdir("./ProblemData/%s/" % dirname)
             for s in files:
-                # 去掉\r
-                tmpfile =  open("./ProblemData/%s/%s" % (problem,s),"r",encoding='utf-8')
-                tstr = tmpfile.read()
-                tstr = tstr.replace('\r','')
-                tmpfile.close()
-                tmpfile =  open("./ProblemData/%s/%s" % (problem,s),"w",encoding='utf-8')
-                tmpfile.write(tstr)
-                tmpfile.close()
+                # 去掉\r，支持多种中文编码
+                try:
+                    content = read_file_try_encodings("./ProblemData/%s/%s" % (problem,s))
+                    content = content.replace('\r','')
+                    tmpfile = open("./ProblemData/%s/%s" % (problem,s),"w",encoding='utf-8')
+                    tmpfile.write(content)
+                    tmpfile.close()
+                except Exception as e:
+                    GlobalVar.logger.error("Error processing file %s: %s" % (s, repr(e)))
                 
             GlobalVar.logger.info("Extract succeed!!")
             return True
@@ -319,6 +321,34 @@ def remote_scp(problem, local_path):
     except IOError as e:
         GlobalVar.logger.error(repr(e))
         return True
+
+# 尝试多种编码读取文件，支持中文测试数据
+def read_file_try_encodings(filepath):
+    encodings = ['utf-8', 'gbk', 'gb2312', 'gb18030', 'big5', 'latin-1']
+    for enc in encodings:
+        try:
+            with open(filepath, 'r', encoding=enc) as f:
+                return f.read()
+        except UnicodeDecodeError:
+            continue
+    # 最后用 errors='replace' 兜底
+    with open(filepath, 'r', encoding='utf-8', errors='replace') as f:
+        return f.read()
+
+# 尝试多种编码打开文件，返回文件对象
+def open_file_try_encodings(filepath):
+    encodings = ['utf-8', 'gbk', 'gb2312', 'gb18030', 'big5', 'latin-1']
+    for enc in encodings:
+        try:
+            f = open(filepath, 'r', encoding=enc)
+            # 尝试读取一小部分验证编码是否正确
+            f.read(100)
+            f.seek(0)
+            return f
+        except UnicodeDecodeError:
+            continue
+    # 最后用 errors='replace' 兜底
+    return open(filepath, 'r', encoding='utf-8', errors='replace')
 
 # 获取系统内存，返回MB，用于判断内存是否足够用于判题，否则，等待内存足够
 def getmem():
@@ -816,7 +846,7 @@ def judge(id, code, lang, problem, contest, username, submittime, contestproblem
             s = s.replace(".out", "")
             try:
                 if s == "casedes.txt":
-                    file3 = open("./ProblemData/%s/casedes.txt" % problem,"r",encoding='utf-8')
+                    file3 = open_file_try_encodings("./ProblemData/%s/casedes.txt" % problem)
                     while file3.readable() is True:
                         des = str(file3.readline()).strip()
                         # print(des)
@@ -892,23 +922,23 @@ def judge(id, code, lang, problem, contest, username, submittime, contestproblem
             if contest == 0:
                 try:
                     # 计算case
-                    inputfile = open("./ProblemData/%s/%s.in" %
-                                     (problem, filename), "r", encoding='utf-8')
+                    inputfile = open_file_try_encodings("./ProblemData/%s/%s.in" %
+                                     (problem, filename))
                     casedata = inputfile.read(300)
                     tmpstr = inputfile.read(5)
                     if tmpstr != "":
                         casedata = casedata + '\n......'
                     inputfile.close()
 
-                    outputfile = open(
-                        "./ProblemData/%s/%s.out" % (problem, filename), "r", encoding='utf-8')
+                    outputfile = open_file_try_encodings(
+                        "./ProblemData/%s/%s.out" % (problem, filename))
                     outputdata = outputfile.read(300)
                     tmpstr = outputfile.read(5)
                     if tmpstr != "":
                         outputdata = outputdata + '\n......'
                     outputfile.close()
 
-                    useroutputfile = open(GlobalVar.judgername+"temp.out", "r", encoding='utf-8')
+                    useroutputfile = open(GlobalVar.judgername+"temp.out", "r", encoding='utf-8', errors='replace')
                     useroutputdata = useroutputfile.read(300)
                     tmpstr = useroutputfile.read(5)
                     if tmpstr != "":
@@ -916,7 +946,8 @@ def judge(id, code, lang, problem, contest, username, submittime, contestproblem
                     useroutputfile.close()
                     # if lang == "Python3":
                     #     useroutputdata = "Python language does not support viewing output"
-                except:
+                except Exception as e:
+                    GlobalVar.logger.error("Error reading case data: " + repr(e))
                     ret["result"] = 5
 
             # 单组样例，程序执行结束，判断是否超时等!
@@ -992,9 +1023,9 @@ def judge(id, code, lang, problem, contest, username, submittime, contestproblem
                 else:
                     GlobalVar.logger.info("Comparing output!")
                     # 比较输出文件是否一致!
-                    file1 = open(GlobalVar.judgername+"temp.out", "r", encoding='utf-8')
-                    file2 = open("./ProblemData/%s/%s.out" %
-                                (problem, filename), "r", encoding='utf-8')
+                    file1 = open(GlobalVar.judgername+"temp.out", "r", encoding='utf-8', errors='replace')
+                    file2 = open_file_try_encodings("./ProblemData/%s/%s.out" %
+                                (problem, filename))
                     stdout = ""
                     answer = ""
                     while True:

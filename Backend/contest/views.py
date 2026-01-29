@@ -24,7 +24,7 @@ class ContestAnnouncementView(viewsets.ModelViewSet):
     pagination_class = LimitOffsetPagination
     permission_classes = (ManagerOnly,)
     filter_backends = (DjangoFilterBackend,)
-    filter_fields = ("contestid",)
+    filterset_fields = ("contestid",)
     throttle_scope = "post"
     throttle_classes = [ScopedRateThrottle, ]
 
@@ -34,7 +34,7 @@ class ContestTutorialView(viewsets.ModelViewSet):
     pagination_class = LimitOffsetPagination
     permission_classes = (ManagerOnly,)
     filter_backends = (DjangoFilterBackend,)
-    filter_fields = ("contestid",)
+    filterset_fields = ("contestid",)
     throttle_scope = "post"
     throttle_classes = [ScopedRateThrottle, ]
 
@@ -44,7 +44,7 @@ class ContestBoardView(viewsets.ModelViewSet):
     serializer_class = ContestBoardSerializer
     permission_classes = (UserRatingOnly,)
     filter_backends = (DjangoFilterBackend,)
-    filter_fields = ("contestid","username","problemrank","type",)
+    filterset_fields = ("contestid","username","problemrank","type",)
     throttle_scope = "post"
     throttle_classes = [ScopedRateThrottle, ]
 
@@ -55,7 +55,7 @@ class ContestCommentView(viewsets.ModelViewSet):
     pagination_class = LimitOffsetPagination
     permission_classes = (UserRatingOnly2,)
     filter_backends = (DjangoFilterBackend,)
-    filter_fields = ("contestid","problem",)
+    filterset_fields = ("contestid","problem",)
     throttle_scope = "post"
     throttle_classes = [ScopedRateThrottle, ]
 
@@ -66,7 +66,7 @@ class ContestInfoView(viewsets.ModelViewSet):
     pagination_class = LimitOffsetPagination
     permission_classes = (ManagerOnly,)
     filter_backends = (DjangoFilterBackend, filters.SearchFilter)
-    filter_fields = ("begintime", "level", "type","title","classes")
+    filterset_fields = ("begintime", "level", "type","title","classes")
     search_fields = ('title',)
     throttle_scope = "post"
     throttle_classes = [ScopedRateThrottle, ]
@@ -87,7 +87,7 @@ class ContestProblemView(viewsets.ModelViewSet):
     pagination_class = LimitOffsetPagination
     permission_classes = (ManagerOnly,)
     filter_backends = (DjangoFilterBackend,)
-    filter_fields = ('contestid',)
+    filterset_fields = ('contestid',)
     throttle_scope = "post"
     throttle_classes = [ScopedRateThrottle, ]
 
@@ -98,7 +98,7 @@ class ContestRegisterView(viewsets.ModelViewSet):
     pagination_class = LimitOffsetPagination
     filter_backends = (DjangoFilterBackend,)
     permission_classes = (UserRatingOnly2,)
-    filter_fields = ('user', "contestid")
+    filterset_fields = ('user', "contestid")
     throttle_scope = "post"
     throttle_classes = [ScopedRateThrottle, ]
 
@@ -110,7 +110,7 @@ class ContestRatingChangeView(viewsets.ModelViewSet):
     pagination_class = LimitOffsetPagination
     permission_classes = (ManagerOnly,)
     filter_backends = (DjangoFilterBackend,)
-    filter_fields = ('user', "contestid")
+    filterset_fields = ('user', "contestid")
     throttle_scope = "post"
     throttle_classes = [ScopedRateThrottle, ]
 
@@ -126,7 +126,7 @@ class ContestBoardTotalView(viewsets.ModelViewSet):
     pagination_class = LimitOffsetPagination
     filter_backends = (DjangoFilterBackend,)
     permission_classes = (ManagerOnly,)
-    filter_fields = ('user','nickname', "contestid")
+    filterset_fields = ('user','nickname', "contestid")
     throttle_scope = "post"
     throttle_classes = [ScopedRateThrottle, ]
 
@@ -211,7 +211,7 @@ class StudentChoiceAnswerView(viewsets.ModelViewSet):
     queryset = StudentChoiceAnswer.objects.all()
     serializer_class = StudentChoiceAnswerSerializer
     permission_classes = (UserOnly,UserOnly1)
-    filter_fields = ('username','contestid')
+    filterset_fields = ('username','contestid')
 
 
 
@@ -219,7 +219,7 @@ class ContestChoiceProblemView(viewsets.ModelViewSet):
     queryset = ContestChoiceProblem.objects.all().order_by('rank')
     serializer_class = ContestChoiceProblemSerializer
     permission_classes = (ManagerOnly,)
-    filter_fields = ('ContestId','ChoiceProblemId', "rank")
+    filterset_fields = ('ContestId','ChoiceProblemId', "rank")
     throttle_scope = "post"
 
 class GetContestChoiceProblems(APIView):

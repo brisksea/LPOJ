@@ -32,7 +32,8 @@ RUN if [ -d /usr/lib/python2.7/site-packages ]; then \
     fi
 
 # Install Python dependencies
-RUN pip3 install --no-cache-dir -r requirements.txt
+RUN pip3 install --no-cache-dir paramiko==3.4.0 requests==2.31.0
+RUN pip3 install --no-cache-dir mysqlclient
 
 # Build judger core
 RUN mkdir -p build && \

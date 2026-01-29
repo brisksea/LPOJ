@@ -15,7 +15,13 @@ int c_cpp_seccomp_rules(struct config *_config) {
                                 SCMP_SYS(access), SCMP_SYS(exit_group),
                                 SCMP_SYS(close), SCMP_SYS(readlink),
                                 SCMP_SYS(sysinfo), SCMP_SYS(write),
-                                SCMP_SYS(writev), SCMP_SYS(lseek)};
+                                SCMP_SYS(writev), SCMP_SYS(lseek),
+                                // Additional syscalls for modern systems (Ubuntu 22.04+)
+                                SCMP_SYS(newfstatat), SCMP_SYS(getrandom),
+                                SCMP_SYS(pread64), SCMP_SYS(futex),
+                                SCMP_SYS(set_tid_address), SCMP_SYS(set_robust_list),
+                                SCMP_SYS(prlimit64), SCMP_SYS(clock_gettime),
+                                SCMP_SYS(rseq), SCMP_SYS(ioctl)};
 
     int syscalls_whitelist_length = sizeof(syscalls_whitelist) / sizeof(int);
     scmp_filter_ctx ctx = NULL;
