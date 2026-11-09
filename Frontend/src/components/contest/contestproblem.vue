@@ -41,7 +41,7 @@
                     id="des">Description</el-row>
             <el-row :gutter="18"
                     id="detail">
-              <div style="margin-right:50px;word-break:break-all;white-space:pre-line;"
+              <div class="markdown-body" style="margin-right:50px;"
                    v-html="des"
                    :key="des"></div>
             </el-row>
@@ -51,14 +51,14 @@
                     id="des">Input</el-row>
             <el-row :gutter="18"
                     id="detail">
-              <div style="margin-right:50px;word-break:break-all;white-space:pre-line;"
+              <div class="markdown-body" style="margin-right:50px;"
                    v-html="input"></div>
             </el-row>
             <el-row :gutter="18"
                     id="des">Output</el-row>
             <el-row :gutter="18"
                     id="detail">
-              <div style="margin-right:50px;word-break:break-all;white-space:pre-line;"
+              <div class="markdown-body" style="margin-right:50px;"
                    v-html="output"></div>
             </el-row>
 
@@ -96,7 +96,7 @@
                     id="des">Hint</el-row>
             <el-row :gutter="18"
                     id="detail">
-              <div style="margin-right:50px;word-break:break-all;white-space:pre-line;"
+              <div class="markdown-body" style="margin-right:50px;"
                    v-html="hint"></div>
             </el-row>
           </el-card>
@@ -159,6 +159,7 @@ import { codemirror } from "vue-codemirror";
 import statusmini from "@/components/utils/statusmini";
 import languageselect from "@/components/utils/languageselect";
 import moment from "moment";
+import { renderMarkdown } from "@/utils/markdown";
 require("codemirror/lib/codemirror.css");
 require("codemirror/theme/base16-light.css");
 require("codemirror/mode/clike/clike");
@@ -304,9 +305,9 @@ export default {
         .get("/problem/" + this.currentproblem + "/")
         .then(response => {
           this.oj = response.data.oj;
-          this.des = response.data.des;
-          this.input = response.data.input;
-          this.output = response.data.output;
+          this.des = renderMarkdown(response.data.des);
+          this.input = renderMarkdown(response.data.input);
+          this.output = renderMarkdown(response.data.output);
           this.sinput = response.data.sinput.split("|#)"); //分隔符
           this.soutput = response.data.soutput.split("|#)");
           this.author = response.data.author;
@@ -335,7 +336,7 @@ export default {
           }
           this.time = response.data.time + "MS";
           this.memory = response.data.memory + "MB";
-          this.hint = response.data.hint;
+          this.hint = renderMarkdown(response.data.hint);
           this.loading = false;
 
         });

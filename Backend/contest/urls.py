@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from django.conf.urls import url, include
+from django.urls import path, re_path, include
 from . import views
 from rest_framework import routers
 
@@ -18,11 +18,11 @@ routers.register('conteststudentchoiceanswer', views.StudentChoiceAnswerView)
 routers.register('contestchoiceproblem', views.ContestChoiceProblemView)
 
 urlpatterns = [
-    url('', include(routers.urls)),
-    url(r'^currenttime', views.CurrentTimeView.as_view()),
-    url(r'^contestfilterboard', views.ContestBoardFilterAPIView.as_view()),
-    url(r'^getcontestchoiceproblems', views.GetContestChoiceProblems.as_view()),
-    url(r'^scorecontestchoiceproblems', views.ScoreContestChoiceProblems.as_view()),
-    url(r'^isboardlock', views.ContestIsBoardLockAPIView.as_view()),
+    path('', include(routers.urls)),
+    re_path(r'^currenttime', views.CurrentTimeView.as_view()),
+    re_path(r'^contestfilterboard', views.ContestBoardFilterAPIView.as_view()),
+    re_path(r'^getcontestchoiceproblems', views.GetContestChoiceProblems.as_view()),
+    re_path(r'^scorecontestchoiceproblems', views.ScoreContestChoiceProblems.as_view()),
+    re_path(r'^isboardlock', views.ContestIsBoardLockAPIView.as_view()),
 
 ]

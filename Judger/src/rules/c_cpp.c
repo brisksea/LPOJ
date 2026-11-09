@@ -22,7 +22,11 @@ int c_cpp_seccomp_rules(struct config *_config) {
                                 SCMP_SYS(rt_sigaction), SCMP_SYS(rt_sigprocmask),
                                 SCMP_SYS(rt_sigreturn), SCMP_SYS(futex),
                                 SCMP_SYS(prlimit64), SCMP_SYS(getrandom),
-                                SCMP_SYS(clock_gettime), SCMP_SYS(exit)
+                                SCMP_SYS(clock_gettime), SCMP_SYS(exit),
+                                SCMP_SYS(ioctl), SCMP_SYS(getcwd),
+                                SCMP_SYS(sched_getaffinity), SCMP_SYS(statx),
+                                SCMP_SYS(mremap), SCMP_SYS(madvise),
+                                SCMP_SYS(mincore)
 #ifdef __NR_rseq
                                 , SCMP_SYS(rseq)
 #endif

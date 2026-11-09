@@ -1,14 +1,16 @@
-FROM node:13.10-slim
-MAINTAINER linzecong
-ADD . ./Frontend
-WORKDIR /Frontend
-RUN apt-get update
-RUN npm install
-RUN npm run build
-RUN apt-get install nginx -y
+FROM node:18-slim
 
-RUN rm -rf /Frontend/node_modules
+LABEL maintainer="linzecong"
+
+# Install nginx
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends nginx && \
+    rm -rf /var/lib/apt/lists/*
+
+# Copy pre-built frontend files from host
+COPY dist /Frontend/dist
+COPY nginx.conf /etc/nginx/nginx.conf
 
 EXPOSE 80
-ADD nginx.conf /etc/nginx/nginx.conf
+
 CMD ["nginx", "-g", "daemon off;"]

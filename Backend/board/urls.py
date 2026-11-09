@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from django.conf.urls import url, include
+from django.urls import path, re_path, include
 from . import views
 from rest_framework import routers
 
@@ -11,5 +11,5 @@ routers.register('dailycontestboard', views.DailyContestBoardView)
 routers.register('settingboard', views.SettingBoardView)
 
 urlpatterns = [
-    url('', include(routers.urls)),
+    path('', include(routers.urls)),
 ]

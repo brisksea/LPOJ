@@ -1,6 +1,6 @@
 {
-    "db_user":"root",
-    "db_pass":"504603913",
+    "db_user":"lpoj",
+    "db_pass":"lpojdatabase",
     "db_ip":"localhost",
     "db_port":"3306",
     "db_database":"LPOJ",

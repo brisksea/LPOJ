@@ -16,7 +16,7 @@ from .serializers import ClassDataSerializer,ClassStudentDataSerializer
 class ClassDataView(viewsets.ModelViewSet):
     queryset = theClasses.objects.all()
     serializer_class = ClassDataSerializer
-    filter_fields = ('className',)
+    filterset_fields = ('className',)
     search_fields = ('className',)
     filter_backends = (DjangoFilterBackend, filters.SearchFilter)
     pagination_class = LimitOffsetPagination
@@ -60,7 +60,7 @@ class DeleteClassDataAPIView(APIView):
 class ClassStudentDataView(viewsets.ModelViewSet):
     queryset = ClassStudentData.objects.all()
     serializer_class = ClassStudentDataSerializer
-    filter_fields = ('studentUserName','studentNumber','className','studentRealName')
+    filterset_fields = ('studentUserName','studentNumber','className','studentRealName')
     search_fields = ('studentUserName','studentNumber','studentRealName')
     filter_backends = (DjangoFilterBackend, filters.SearchFilter)
     throttle_scope = "post"

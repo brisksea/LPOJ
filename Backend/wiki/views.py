@@ -8,7 +8,7 @@ from .models import Wiki, MBCode, MBCodeDetail, TrainningContest
 class WikiView(viewsets.ModelViewSet):
     queryset = Wiki.objects.all()
     serializer_class = WikiSerializer
-    filter_fields = ('username', 'type', 'group', 'std',)
+    filterset_fields = ('username', 'type', 'group', 'std',)
     permission_classes = (WikiUserOnly,)
     throttle_scope = "post"
     throttle_classes = [ScopedRateThrottle, ]
@@ -17,7 +17,7 @@ class WikiView(viewsets.ModelViewSet):
 class WikiCountView(viewsets.ModelViewSet):
     queryset = Wiki.objects.all()
     serializer_class = WikiCountSerializer
-    filter_fields = ('username', 'type')
+    filterset_fields = ('username', 'type')
     permission_classes = (UserOnly,)
     throttle_scope = "post"
     throttle_classes = [ScopedRateThrottle, ]
@@ -26,7 +26,7 @@ class WikiCountView(viewsets.ModelViewSet):
 class MBCodeView(viewsets.ModelViewSet):
     queryset = MBCode.objects.all()
     serializer_class = MBCodeSerializer
-    filter_fields = ('username',)
+    filterset_fields = ('username',)
     permission_classes = (UserOnly,)
     throttle_scope = "post"
     throttle_classes = [ScopedRateThrottle, ]
@@ -35,7 +35,7 @@ class MBCodeView(viewsets.ModelViewSet):
 class MBCodeDetailView(viewsets.ModelViewSet):
     queryset = MBCodeDetail.objects.all()
     serializer_class = MBCodeDetailSerializer
-    filter_fields = ('username', 'group', 'des', 'title')
+    filterset_fields = ('username', 'group', 'des', 'title')
     permission_classes = (UserOnly,)
     throttle_scope = "post"
     throttle_classes = [ScopedRateThrottle, ]
@@ -44,7 +44,7 @@ class MBCodeDetailView(viewsets.ModelViewSet):
 class MBCodeDetailNoCodeView(viewsets.ModelViewSet):
     queryset = MBCodeDetail.objects.all()
     serializer_class = MBCodeDetailNoCodeSerializer
-    filter_fields = ('username', 'group', 'des', 'title')
+    filterset_fields = ('username', 'group', 'des', 'title')
     permission_classes = (UserOnly,)
     throttle_scope = "post"
     throttle_classes = [ScopedRateThrottle, ]
@@ -53,7 +53,7 @@ class MBCodeDetailNoCodeView(viewsets.ModelViewSet):
 class TrainningContestView(viewsets.ModelViewSet):
     queryset = TrainningContest.objects.all().order_by("num")
     serializer_class = TrainningContestSerializer
-    filter_fields = ('group', 'title',)
+    filterset_fields = ('group', 'title',)
     permission_classes = (ManagerOnly,)
     throttle_scope = "post"
     throttle_classes = [ScopedRateThrottle, ]

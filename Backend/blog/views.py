@@ -9,7 +9,7 @@ from .permission import ManagerOnly, UserRatingOnly
 class BannerView(viewsets.ModelViewSet):
     queryset = Banner.objects.all().order_by("-id")
     serializer_class = BannerSerializer
-    filter_fields = ('time',)
+    filterset_fields = ('time',)
     permission_classes = (ManagerOnly,)
     pagination_class = LimitOffsetPagination
     throttle_scope = "post"
@@ -19,7 +19,7 @@ class BannerView(viewsets.ModelViewSet):
 class OJMessageView(viewsets.ModelViewSet):
     queryset = OJMessage.objects.all().order_by("-id")
     serializer_class = OJMessageSerializer
-    filter_fields = ('username', 'time')
+    filterset_fields = ('username', 'time')
     permission_classes = (UserRatingOnly,)
     pagination_class = LimitOffsetPagination
     throttle_scope = "post"
@@ -29,7 +29,7 @@ class OJMessageView(viewsets.ModelViewSet):
 class BlogView(viewsets.ModelViewSet):
     queryset = Blog.objects.all().order_by("-id")
     serializer_class = BlogSerializer
-    filter_fields = ('username', 'time')
+    filterset_fields = ('username', 'time')
     pagination_class = LimitOffsetPagination
     permission_classes = (ManagerOnly,)
     throttle_scope = "post"

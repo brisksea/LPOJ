@@ -34,7 +34,7 @@ services:
             DB_USER: 'root' # 选择性修改
             DB_PORT: 3306 # 选择性修改
     ports:
-     - "8000:8000"
+     - "9003:8000"
     restart: always
     volumes:
         - "./Backend:/Backend"
@@ -56,11 +56,11 @@ services:
             DB_USER: 'root' # 选择性修改
             DB_PORT: 3306 # 选择性修改
     ports:
-     - "8001:8000"
+     - "9001:8000"
     restart: always
     volumes:
         - "./Backend:/Backend"
-    
+
   backend3:
     build: ./Backend
     depends_on: 
@@ -78,7 +78,7 @@ services:
             DB_USER: 'root' # 选择性修改
             DB_PORT: 3306 # 选择性修改
     ports:
-     - "8002:8000"
+     - "9002:8000"
     restart: always
     volumes:
         - "./Backend:/Backend"
@@ -97,7 +97,7 @@ services:
       - backend2:lpojbackend2
       - backend3:lpojbackend3
     ports:
-     - "8080:80"
+     - "9080:80"
     restart: always
     volumes:
       - "./Frontend/dist/img:/Frontend/dist/img"
@@ -116,7 +116,7 @@ services:
       - backend2:lpojbackend2
       - backend3:lpojbackend3
     ports:
-     - "8081:8081"
+     - "9081:80"
     restart: always
     volumes:
       - "./FrontendMobile/dist/img:/FrontendMobile/dist/img"
