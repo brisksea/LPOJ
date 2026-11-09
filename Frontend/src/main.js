@@ -8,6 +8,7 @@ import md5 from 'js-md5';
 import axios from 'axios';
 import VueClipboard from 'vue-clipboard2'
 import 'babel-polyfill' //兼容IE6
+import '@/assets/css/markdown.css'
 
 import ElementUI from 'element-ui';
 import 'element-ui/lib/theme-chalk/index.css';

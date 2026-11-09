@@ -21,7 +21,10 @@ int c_cpp_seccomp_rules(struct config *_config) {
                                 SCMP_SYS(pread64), SCMP_SYS(futex),
                                 SCMP_SYS(set_tid_address), SCMP_SYS(set_robust_list),
                                 SCMP_SYS(prlimit64), SCMP_SYS(clock_gettime),
-                                SCMP_SYS(rseq), SCMP_SYS(ioctl)};
+                                SCMP_SYS(rseq), SCMP_SYS(ioctl),
+                                SCMP_SYS(getcwd), SCMP_SYS(sched_getaffinity),
+                                SCMP_SYS(statx), SCMP_SYS(mremap),
+                                SCMP_SYS(madvise), SCMP_SYS(mincore)};
 
     int syscalls_whitelist_length = sizeof(syscalls_whitelist) / sizeof(int);
     scmp_filter_ctx ctx = NULL;

@@ -8,8 +8,8 @@ RUN apt-get update && \
     rm -rf /var/lib/apt/lists/*
 
 # Copy pre-built frontend files from host
-COPY Frontend/dist /frontend/dist
-COPY Frontend/nginx.conf /etc/nginx/nginx.conf
+COPY dist /Frontend/dist
+COPY nginx.conf /etc/nginx/nginx.conf
 
 EXPOSE 80
 

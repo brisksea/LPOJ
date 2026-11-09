@@ -196,10 +196,10 @@ class Controller:
 
 # SPJ函数，首先编译，然后运行，然后返回程序运行结果
 def specialjudge(problem,testin,testout,userout):
-    result = os.system("timeout 10 g++ ./ProblemData/%s/spj.cpp -o spj_%s.out -O2 -std=c++14" % (str(problem),GlobalVar.judgername))
+    result = os.system("LANG=en_US.UTF-8 LC_ALL=en_US.UTF-8 timeout 10 g++ ./ProblemData/%s/spj.cpp -o spj_%s.out -O2 -std=c++14 -finput-charset=utf-8" % (str(problem),GlobalVar.judgername))
     if result:
         return 5
-    res = os.system("timeout 20 ./spj_%s.out %s %s %s" % (GlobalVar.judgername, testin, testout, userout))
+    res = os.system("LANG=en_US.UTF-8 LC_ALL=en_US.UTF-8 timeout 20 ./spj_%s.out %s %s %s" % (GlobalVar.judgername, testin, testout, userout))
     return res
 
 # 用于远程下载数据文件，首先判断数据文件有没有更新，有的话就更新
@@ -404,7 +404,7 @@ def judgePython2(timelimit, memorylimit, inputpath, outputpath, errorpath, id, j
                         error_path=errorpath,
                         args=[judgername+".py"],
                         # can be empty list
-                        env=["PYTHONIOENCODING=utf-8"],
+                        env=["PYTHONIOENCODING=utf-8", "LANG=en_US.UTF-8", "LC_ALL=en_US.UTF-8"],
                         log_path=judgername+"judger.log",
                         # can be None
                         seccomp_rule_name="general",
@@ -426,7 +426,7 @@ def judgePython3(timelimit, memorylimit, inputpath, outputpath, errorpath, id, j
                         error_path=errorpath,
                         args=[judgername+".py"],
                         # can be empty list
-                        env=["PYTHONIOENCODING=utf-8"],
+                        env=["PYTHONIOENCODING=utf-8", "LANG=en_US.UTF-8", "LC_ALL=en_US.UTF-8"],
                         log_path=judgername+"judger.log",
                         # can be None
                         seccomp_rule_name="general",
@@ -448,7 +448,7 @@ def judgeC(timelimit, memorylimit, inputpath, outputpath, errorpath, id, judgern
                         error_path=errorpath,
                         args=[],
                         # can be empty list
-                        env=[],
+                        env=["LANG=en_US.UTF-8", "LC_ALL=en_US.UTF-8"],
                         log_path=judgername+"judger.log",
                         # can be None
                         seccomp_rule_name="c_cpp",
@@ -470,7 +470,7 @@ def judgeCPP(timelimit, memorylimit, inputpath, outputpath, errorpath, id, judge
                         error_path=errorpath,
                         args=[],
                         # can be empty list
-                        env=[],
+                        env=["LANG=en_US.UTF-8", "LC_ALL=en_US.UTF-8"],
                         log_path=judgername+"judger.log",
                         # can be None
                         seccomp_rule_name="c_cpp",
@@ -493,7 +493,7 @@ def judgeJava(timelimit, memorylimit, inputpath, outputpath, errorpath, id, judg
                         error_path=errorpath,
                         args=["-cp",judgername,"-Djava.security.policy==policy","-Djava.awt.headless=true","Main"],
                         # can be empty list
-                        env=[],
+                        env=["LANG=en_US.UTF-8", "LC_ALL=en_US.UTF-8"],
                         log_path=judgername+"judger.log",
                         # can be None
                         seccomp_rule_name=None,
@@ -517,7 +517,7 @@ def judgeSwift(timelimit, memorylimit, inputpath, outputpath, errorpath, id, jud
                         error_path=errorpath,
                         args=[],
                         # can be empty list
-                        env=[],
+                        env=["LANG=en_US.UTF-8", "LC_ALL=en_US.UTF-8"],
                         log_path=judgername+"judger.log",
                         # can be None
                         seccomp_rule_name="general",
@@ -529,7 +529,8 @@ def compileC(id,code,judgername,problem):
     file = open("%s.c" % judgername, "w",encoding='utf-8')
     file.write(code)
     file.close()
-    result = os.system("timeout 10 gcc %s.c -fmax-errors=3 -o %s.out -O2 -std=c11 2>%sce.txt" % (judgername, judgername, judgername))
+    # Compile with UTF-8 support for Chinese characters in code/comments
+    result = os.system("LANG=en_US.UTF-8 LC_ALL=en_US.UTF-8 timeout 10 gcc %s.c -fmax-errors=3 -finput-charset=utf-8 -o %s.out -O2 -std=c11 2>%sce.txt" % (judgername, judgername, judgername))
     if result:
         try:
             filece = open("%sce.txt" % judgername, "r", encoding='utf-8')
@@ -549,7 +550,8 @@ def compileCPP(id,code,judgername,problem):
     file = open("%s.cpp" % judgername, "w",encoding='utf-8')
     file.write(code)
     file.close()
-    result = os.system("timeout 10 g++ %s.cpp -fmax-errors=3 -o %s.out -O2 -std=c++14 2>%sce.txt" %(judgername, judgername, judgername))
+    # Compile with UTF-8 support for Chinese characters in code/comments
+    result = os.system("LANG=en_US.UTF-8 LC_ALL=en_US.UTF-8 timeout 10 g++ %s.cpp -fmax-errors=3 -finput-charset=utf-8 -o %s.out -O2 -std=c++14 2>%sce.txt" %(judgername, judgername, judgername))
     if result:
         try:
             filece = open("%sce.txt" % judgername, "r", encoding='utf-8')
@@ -618,7 +620,7 @@ def compileSwift(id,code,judgername,problem):
     file = open("%s.swift" % judgername, "w",encoding='utf-8')
     file.write(code)
     file.close()
-    result = os.system("swiftc %s.swift -o %s.out 2>%sce.txt" %(judgername, judgername, judgername))
+    result = os.system("LANG=en_US.UTF-8 LC_ALL=en_US.UTF-8 swiftc %s.swift -o %s.out 2>%sce.txt" %(judgername, judgername, judgername))
     if result:
         try:
             filece = open("%sce.txt" % judgername, "r", encoding='utf-8')

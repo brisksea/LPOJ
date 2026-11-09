@@ -22,8 +22,20 @@ RUN apt-get update && \
     cmake \
     openjdk-11-jdk \
     libseccomp-dev \
-    build-essential && \
+    build-essential \
+    locales && \
     rm -rf /var/lib/apt/lists/*
+
+# Configure UTF-8 locale for Chinese character support
+RUN echo "en_US.UTF-8 UTF-8" > /etc/locale.gen && \
+    echo "zh_CN.UTF-8 UTF-8" >> /etc/locale.gen && \
+    locale-gen && \
+    update-locale LANG=en_US.UTF-8
+
+# Set environment variables for UTF-8 support
+ENV LANG=en_US.UTF-8 \
+    LC_ALL=en_US.UTF-8 \
+    PYTHONIOENCODING=utf-8
 
 # Setup Python 2.7 compatibility (if still needed)
 RUN if [ -d /usr/lib/python2.7/site-packages ]; then \
