@@ -55,7 +55,7 @@ class GlobalVar:
         GlobalVar.initLogger()
 
         GlobalVar.statue = True
-        myjsonfile = open("./setting.json", 'r')
+        myjsonfile = open("./setting.json", 'r', encoding='utf-8')
         GlobalVar.judgerjson = json.loads(myjsonfile.read())
         myjsonfile.close()
 
@@ -72,7 +72,7 @@ class GlobalVar:
             # GlobalVar.judgerjson["backend_path"] = os.environ.get("BACKEND_PATH")
             GlobalVar.judgerjson["nodownload"] = os.environ.get("NO_DOWNLOAD")
 
-        datajsonfile = open("./datatime.json", 'r')
+        datajsonfile = open("./datatime.json", 'r', encoding='utf-8')
         GlobalVar.datatimejson = json.loads(datajsonfile.read())
         datajsonfile.close()
 
@@ -80,7 +80,7 @@ class GlobalVar:
         GlobalVar.logger.info("Judger name: " + GlobalVar.judgername)
 
         GlobalVar.host = GlobalVar.judgerjson["server_ip"]
-        GlobalVar.port = GlobalVar.judgerjson["server_port"]
+        GlobalVar.port = int(GlobalVar.judgerjson["server_port"])
         GlobalVar.python3path = GlobalVar.judgerjson["python3_path"]
         GlobalVar.python2path = GlobalVar.judgerjson["python2_path"]
 
@@ -196,10 +196,10 @@ class Controller:
 
 # SPJ函数，首先编译，然后运行，然后返回程序运行结果
 def specialjudge(problem,testin,testout,userout):
-    result = os.system("timeout 10 g++ ./ProblemData/%s/spj.cpp -o spj_%s.out -O2 -std=c++14" % (str(problem),GlobalVar.judgername))
+    result = os.system("LANG=en_US.UTF-8 LC_ALL=en_US.UTF-8 timeout 10 g++ ./ProblemData/%s/spj.cpp -o spj_%s.out -O2 -std=c++14 -finput-charset=utf-8" % (str(problem),GlobalVar.judgername))
     if result:
         return 5
-    res = os.system("timeout 20 ./spj_%s.out %s %s %s" % (GlobalVar.judgername, testin, testout, userout))
+    res = os.system("LANG=en_US.UTF-8 LC_ALL=en_US.UTF-8 timeout 20 ./spj_%s.out %s %s %s" % (GlobalVar.judgername, testin, testout, userout))
     return res
 
 # 用于远程下载数据文件，首先判断数据文件有没有更新，有的话就更新
@@ -224,14 +224,15 @@ def remote_scp(problem, local_path):
 
             files = os.listdir("./ProblemData/%s/" % dirname)
             for s in files:
-                # 去掉\r
-                tmpfile =  open("./ProblemData/%s/%s" % (problem,s),"r",encoding='utf-8')
-                tstr = tmpfile.read()
-                tstr = tstr.replace('\r','')
-                tmpfile.close()
-                tmpfile =  open("./ProblemData/%s/%s" % (problem,s),"w",encoding='utf-8')
-                tmpfile.write(tstr)
-                tmpfile.close()
+                # 去掉\r，支持多种中文编码
+                try:
+                    content = read_file_try_encodings("./ProblemData/%s/%s" % (problem,s))
+                    content = content.replace('\r','')
+                    tmpfile = open("./ProblemData/%s/%s" % (problem,s),"w",encoding='utf-8')
+                    tmpfile.write(content)
+                    tmpfile.close()
+                except Exception as e:
+                    GlobalVar.logger.error("Error processing file %s: %s" % (s, repr(e)))
                 
             GlobalVar.logger.info("Extract Succeed!")
             return True
@@ -299,14 +300,15 @@ def remote_scp(problem, local_path):
 
             files = os.listdir("./ProblemData/%s/" % dirname)
             for s in files:
-                # 去掉\r
-                tmpfile =  open("./ProblemData/%s/%s" % (problem,s),"r",encoding='utf-8')
-                tstr = tmpfile.read()
-                tstr = tstr.replace('\r','')
-                tmpfile.close()
-                tmpfile =  open("./ProblemData/%s/%s" % (problem,s),"w",encoding='utf-8')
-                tmpfile.write(tstr)
-                tmpfile.close()
+                # 去掉\r，支持多种中文编码
+                try:
+                    content = read_file_try_encodings("./ProblemData/%s/%s" % (problem,s))
+                    content = content.replace('\r','')
+                    tmpfile = open("./ProblemData/%s/%s" % (problem,s),"w",encoding='utf-8')
+                    tmpfile.write(content)
+                    tmpfile.close()
+                except Exception as e:
+                    GlobalVar.logger.error("Error processing file %s: %s" % (s, repr(e)))
                 
             GlobalVar.logger.info("Extract succeed!!")
             return True
@@ -319,6 +321,34 @@ def remote_scp(problem, local_path):
     except IOError as e:
         GlobalVar.logger.error(repr(e))
         return True
+
+# 尝试多种编码读取文件，支持中文测试数据
+def read_file_try_encodings(filepath):
+    encodings = ['utf-8', 'gbk', 'gb2312', 'gb18030', 'big5', 'latin-1']
+    for enc in encodings:
+        try:
+            with open(filepath, 'r', encoding=enc) as f:
+                return f.read()
+        except UnicodeDecodeError:
+            continue
+    # 最后用 errors='replace' 兜底
+    with open(filepath, 'r', encoding='utf-8', errors='replace') as f:
+        return f.read()
+
+# 尝试多种编码打开文件，返回文件对象
+def open_file_try_encodings(filepath):
+    encodings = ['utf-8', 'gbk', 'gb2312', 'gb18030', 'big5', 'latin-1']
+    for enc in encodings:
+        try:
+            f = open(filepath, 'r', encoding=enc)
+            # 尝试读取一小部分验证编码是否正确
+            f.read(100)
+            f.seek(0)
+            return f
+        except UnicodeDecodeError:
+            continue
+    # 最后用 errors='replace' 兜底
+    return open(filepath, 'r', encoding='utf-8', errors='replace')
 
 # 获取系统内存，返回MB，用于判断内存是否足够用于判题，否则，等待内存足够
 def getmem():
@@ -374,7 +404,7 @@ def judgePython2(timelimit, memorylimit, inputpath, outputpath, errorpath, id, j
                         error_path=errorpath,
                         args=[judgername+".py"],
                         # can be empty list
-                        env=[],
+                        env=["PYTHONIOENCODING=utf-8", "LANG=en_US.UTF-8", "LC_ALL=en_US.UTF-8"],
                         log_path=judgername+"judger.log",
                         # can be None
                         seccomp_rule_name="general",
@@ -396,7 +426,7 @@ def judgePython3(timelimit, memorylimit, inputpath, outputpath, errorpath, id, j
                         error_path=errorpath,
                         args=[judgername+".py"],
                         # can be empty list
-                        env=[],
+                        env=["PYTHONIOENCODING=utf-8", "LANG=en_US.UTF-8", "LC_ALL=en_US.UTF-8"],
                         log_path=judgername+"judger.log",
                         # can be None
                         seccomp_rule_name="general",
@@ -418,7 +448,7 @@ def judgeC(timelimit, memorylimit, inputpath, outputpath, errorpath, id, judgern
                         error_path=errorpath,
                         args=[],
                         # can be empty list
-                        env=[],
+                        env=["LANG=en_US.UTF-8", "LC_ALL=en_US.UTF-8"],
                         log_path=judgername+"judger.log",
                         # can be None
                         seccomp_rule_name="c_cpp",
@@ -440,7 +470,7 @@ def judgeCPP(timelimit, memorylimit, inputpath, outputpath, errorpath, id, judge
                         error_path=errorpath,
                         args=[],
                         # can be empty list
-                        env=[],
+                        env=["LANG=en_US.UTF-8", "LC_ALL=en_US.UTF-8"],
                         log_path=judgername+"judger.log",
                         # can be None
                         seccomp_rule_name="c_cpp",
@@ -463,7 +493,7 @@ def judgeJava(timelimit, memorylimit, inputpath, outputpath, errorpath, id, judg
                         error_path=errorpath,
                         args=["-cp",judgername,"-Djava.security.policy==policy","-Djava.awt.headless=true","Main"],
                         # can be empty list
-                        env=[],
+                        env=["LANG=en_US.UTF-8", "LC_ALL=en_US.UTF-8"],
                         log_path=judgername+"judger.log",
                         # can be None
                         seccomp_rule_name=None,
@@ -487,7 +517,7 @@ def judgeSwift(timelimit, memorylimit, inputpath, outputpath, errorpath, id, jud
                         error_path=errorpath,
                         args=[],
                         # can be empty list
-                        env=[],
+                        env=["LANG=en_US.UTF-8", "LC_ALL=en_US.UTF-8"],
                         log_path=judgername+"judger.log",
                         # can be None
                         seccomp_rule_name="general",
@@ -499,10 +529,11 @@ def compileC(id,code,judgername,problem):
     file = open("%s.c" % judgername, "w",encoding='utf-8')
     file.write(code)
     file.close()
-    result = os.system("timeout 10 gcc %s.c -fmax-errors=3 -o %s.out -O2 -std=c11 2>%sce.txt" % (judgername, judgername, judgername))
+    # Compile with UTF-8 support for Chinese characters in code/comments
+    result = os.system("LANG=en_US.UTF-8 LC_ALL=en_US.UTF-8 timeout 10 gcc %s.c -fmax-errors=3 -finput-charset=utf-8 -o %s.out -O2 -std=c11 2>%sce.txt" % (judgername, judgername, judgername))
     if result:
         try:
-            filece = open("%sce.txt" % judgername, "r")
+            filece = open("%sce.txt" % judgername, "r", encoding='utf-8')
             msg = str(filece.read())
             if msg == "": msg = "Compile timeout! Maybe you define too big arrays!"
             filece.close()
@@ -519,10 +550,11 @@ def compileCPP(id,code,judgername,problem):
     file = open("%s.cpp" % judgername, "w",encoding='utf-8')
     file.write(code)
     file.close()
-    result = os.system("timeout 10 g++ %s.cpp -fmax-errors=3 -o %s.out -O2 -std=c++14 2>%sce.txt" %(judgername, judgername, judgername))
+    # Compile with UTF-8 support for Chinese characters in code/comments
+    result = os.system("LANG=en_US.UTF-8 LC_ALL=en_US.UTF-8 timeout 10 g++ %s.cpp -fmax-errors=3 -finput-charset=utf-8 -o %s.out -O2 -std=c++14 2>%sce.txt" %(judgername, judgername, judgername))
     if result:
         try:
-            filece = open("%sce.txt" % judgername, "r")
+            filece = open("%sce.txt" % judgername, "r", encoding='utf-8')
             msg = str(filece.read())
             if msg == "": msg = "Compile timeout! Maybe you define too big arrays!"
             filece.close()
@@ -572,7 +604,7 @@ def compileJava(id,code,judgername,problem):
 
     if result:
         try:
-            filece = open("%sce.txt" % judgername, "r")
+            filece = open("%sce.txt" % judgername, "r", encoding='utf-8')
             msg = str(filece.read())
             filece.close()
             Controller.compileError(id,problem,msg)
@@ -588,10 +620,10 @@ def compileSwift(id,code,judgername,problem):
     file = open("%s.swift" % judgername, "w",encoding='utf-8')
     file.write(code)
     file.close()
-    result = os.system("swiftc %s.swift -o %s.out 2>%sce.txt" %(judgername, judgername, judgername))
+    result = os.system("LANG=en_US.UTF-8 LC_ALL=en_US.UTF-8 swiftc %s.swift -o %s.out 2>%sce.txt" %(judgername, judgername, judgername))
     if result:
         try:
-            filece = open("%sce.txt" % judgername, "r")
+            filece = open("%sce.txt" % judgername, "r", encoding='utf-8')
             msg = str(filece.read())
             if msg == "": msg = "Compile timeout! Maybe you define too big arrays!"
             filece.close()
@@ -816,7 +848,7 @@ def judge(id, code, lang, problem, contest, username, submittime, contestproblem
             s = s.replace(".out", "")
             try:
                 if s == "casedes.txt":
-                    file3 = open("./ProblemData/%s/casedes.txt" % problem,"r",encoding='utf-8')
+                    file3 = open_file_try_encodings("./ProblemData/%s/casedes.txt" % problem)
                     while file3.readable() is True:
                         des = str(file3.readline()).strip()
                         # print(des)
@@ -892,23 +924,23 @@ def judge(id, code, lang, problem, contest, username, submittime, contestproblem
             if contest == 0:
                 try:
                     # 计算case
-                    inputfile = open("./ProblemData/%s/%s.in" %
-                                     (problem, filename), "r")
+                    inputfile = open_file_try_encodings("./ProblemData/%s/%s.in" %
+                                     (problem, filename))
                     casedata = inputfile.read(300)
                     tmpstr = inputfile.read(5)
                     if tmpstr != "":
                         casedata = casedata + '\n......'
                     inputfile.close()
 
-                    outputfile = open(
-                        "./ProblemData/%s/%s.out" % (problem, filename), "r")
+                    outputfile = open_file_try_encodings(
+                        "./ProblemData/%s/%s.out" % (problem, filename))
                     outputdata = outputfile.read(300)
                     tmpstr = outputfile.read(5)
                     if tmpstr != "":
                         outputdata = outputdata + '\n......'
                     outputfile.close()
 
-                    useroutputfile = open(GlobalVar.judgername+"temp.out", "r")
+                    useroutputfile = open(GlobalVar.judgername+"temp.out", "r", encoding='utf-8', errors='replace')
                     useroutputdata = useroutputfile.read(300)
                     tmpstr = useroutputfile.read(5)
                     if tmpstr != "":
@@ -916,15 +948,16 @@ def judge(id, code, lang, problem, contest, username, submittime, contestproblem
                     useroutputfile.close()
                     # if lang == "Python3":
                     #     useroutputdata = "Python language does not support viewing output"
-                except:
+                except Exception as e:
+                    GlobalVar.logger.error("Error reading case data: " + repr(e))
                     ret["result"] = 5
 
             # 单组样例，程序执行结束，判断是否超时等!
             if ret["result"] != 0:
 
-                # 青岛大学判 Memory Exceed的一个迷之Bug，所以要特判一下
+                # Keep legacy loader mapping; SIGSYS remains Runtime Error.
 
-                if (ret["result"] == 4 and ret["exit_code"] == 127 and ret["signal"] == 0) or (ret["result"] == 4 and ret["exit_code"] == 0 and ret["signal"] == 31):
+                if ret["result"] == 4 and ret["exit_code"] == 127 and ret["signal"] == 0:
 
                     # 更新最终结果为第一次错误的样例
                     if myresult == 100:
@@ -992,9 +1025,9 @@ def judge(id, code, lang, problem, contest, username, submittime, contestproblem
                 else:
                     GlobalVar.logger.info("Comparing output!")
                     # 比较输出文件是否一致!
-                    file1 = open(GlobalVar.judgername+"temp.out", "r")
-                    file2 = open("./ProblemData/%s/%s.out" %
-                                (problem, filename), "r")
+                    file1 = open(GlobalVar.judgername+"temp.out", "r", encoding='utf-8', errors='replace')
+                    file2 = open_file_try_encodings("./ProblemData/%s/%s.out" %
+                                (problem, filename))
                     stdout = ""
                     answer = ""
                     while True:

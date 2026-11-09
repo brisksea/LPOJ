@@ -124,9 +124,16 @@ class UserLoginDataAPIView(APIView):
         x_forwarded_for = request.META.get('HTTP_X_FORWARDED_FOR')
         if x_forwarded_for:
             ip = x_forwarded_for.split(',')[0]#所以这里是真实的ip
+            #ip = x_forwarded_for#所以这里是真实的ip
         else:
             ip = request.META.get('REMOTE_ADDR')#这里获得代理ip
-        
+#        print(request.META)
+#        print(request.META.get("HTTP_X_REAL_IP"))
+#       file = open("aip.txt","w")
+#        file.write(str(request.META))
+#        file.write(str(request.META.get("HTTP_X_REAL_IP")))
+#        file.close()
+        #data["msg"] = request.META.get("HTTP_USER_AGENT","获取失败")
         data["msg"] = request.META.get("HTTP_USER_AGENT","获取失败")
         data["ip"] = ip
         print(data)
